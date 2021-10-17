@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,21 +9,42 @@ import {
   ScrollView,
 } from "react-native";
 import { theme } from "./colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const STORAGE_KEY = "@toDos";
 export default function App() {
+  useEffect(() => {
+    loadTodos();
+  }, []);
+
+  // useState
   const [working, setWorking] = useState(true);
   const [text, setText] = useState("");
   const [todos, setTodos] = useState({});
+
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
-  const addTodo = () => {
+
+  const addTodo = async () => {
     if (text === "") return;
-    // 할 일 저장
     const newTodos = { ...todos, [Date.now()]: { text, working } };
     setTodos(newTodos);
+    await saveTodos(newTodos);
     setText("");
   };
+  //AsyncStorage 저장
+  const saveTodos = async (toSave) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    } catch (err) {}
+  };
+  //AsyncStorage 읽기
+  const loadTodos = async () => {
+    const s = await AsyncStorage.getItem(STORAGE_KEY);
+    setTodos(JSON.parse(s));
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -104,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   todoText: {
-    color: theme.tc,
+    color: "#fff",
     fontSize: 16,
   },
 });
