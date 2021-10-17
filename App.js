@@ -7,6 +7,7 @@ import {
   View,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { theme } from "./colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -44,7 +45,22 @@ export default function App() {
     const s = await AsyncStorage.getItem(STORAGE_KEY);
     setTodos(JSON.parse(s));
   };
-
+  // 삭제하기
+  const deleteTodo = (key) => {
+    Alert.alert("삭제 하시겠습니까?", "복구할 수 없어요.", [
+      {
+        text: "삭제",
+        onPress: async () => {
+          const newTodos = {...todos}
+          delete newTodos[key];
+          setTodos(newTodos);
+          await saveTodos(newTodos);
+        },
+      },
+      { text: "취소" },
+    ]);
+    // return
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -83,6 +99,9 @@ export default function App() {
             return todos[el].working === working ? (
               <View style={styles.todo} key={el}>
                 <Text style={styles.todoText}>{todos[el].text}</Text>
+                <TouchableOpacity onPress={() => deleteTodo(el)}>
+                  <Text>X</Text>
+                </TouchableOpacity>
               </View>
             ) : null;
           })}
@@ -123,6 +142,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   todoText: {
     color: "#fff",
