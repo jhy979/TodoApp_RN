@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { theme } from "./colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome } from "@expo/vector-icons";
 
 const STORAGE_KEY = "@toDos";
 export default function App() {
@@ -51,7 +52,7 @@ export default function App() {
       {
         text: "삭제",
         onPress: async () => {
-          const newTodos = {...todos}
+          const newTodos = { ...todos };
           delete newTodos[key];
           setTodos(newTodos);
           await saveTodos(newTodos);
@@ -100,7 +101,7 @@ export default function App() {
               <View style={styles.todo} key={el}>
                 <Text style={styles.todoText}>{todos[el].text}</Text>
                 <TouchableOpacity onPress={() => deleteTodo(el)}>
-                  <Text>X</Text>
+                  <FontAwesome name="trash" size={18} color={theme.tc} />
                 </TouchableOpacity>
               </View>
             ) : null;
